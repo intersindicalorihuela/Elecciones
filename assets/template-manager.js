@@ -469,15 +469,9 @@
     return saveAllTemplates(all);
   }
 
-  // Eliminar una plantilla
+  // Eliminar una plantilla (ahora permite eliminar cualquier plantilla)
   function deleteTemplate(templateId) {
     const all = getAllTemplates();
-    
-    if (DEFAULT_TEMPLATES[templateId]) {
-      alert('No se pueden eliminar las plantillas predefinidas');
-      return false;
-    }
-    
     delete all[templateId];
     return saveAllTemplates(all);
   }
@@ -543,14 +537,13 @@
     return list;
   }
 
-  // Inicializar plantillas por defecto
+  // Inicializar plantillas por defecto (solo primera vez)
   function initializeTemplates() {
     const saved = getAllTemplates();
-    const hasAllDefaults = Object.keys(DEFAULT_TEMPLATES).every(id => saved[id]);
+    const isEmpty = Object.keys(saved).length === 0;
     
-    if (!hasAllDefaults) {
-      const updated = { ...DEFAULT_TEMPLATES, ...saved };
-      saveAllTemplates(updated);
+    if (isEmpty) {
+      saveAllTemplates({ ...DEFAULT_TEMPLATES });
     }
   }
 
@@ -569,6 +562,12 @@
   // Inicializar al cargar el script
   initializeTemplates();
 
+  // Restablecer plantillas a valores por defecto
+  function resetToDefaults() {
+    saveAllTemplates({ ...DEFAULT_TEMPLATES });
+    return true;
+  }
+
   // Exponer API globalmente
   window.DepartmentTemplateManager = {
     getAllTemplates,
@@ -579,6 +578,7 @@
     createNewTemplate,
     getTemplatesForMenu,
     loadPreset,
+    resetToDefaults,
     DEFAULT_TEMPLATES,
     MAX_DEPARTMENTS,
     STORAGE_KEY

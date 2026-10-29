@@ -478,16 +478,10 @@ function saveTemplate(template) {
 }
 
 /**
- * Eliminar una plantilla
+ * Eliminar una plantilla (ahora permite eliminar cualquier plantilla)
  */
 function deleteTemplate(templateId) {
   const allTemplates = getAllTemplates();
-  
-  // No permitir eliminar plantillas por defecto
-  if (DEFAULT_TEMPLATES[templateId]) {
-    throw new Error('No se pueden eliminar las plantillas predefinidas');
-  }
-  
   delete allTemplates[templateId];
   return saveAllTemplates(allTemplates);
 }
@@ -575,20 +569,24 @@ function getLoadPresetHandler(setConfig, setMesas) {
 }
 
 /**
- * Inicializar el sistema de plantillas
+ * Inicializar el sistema de plantillas (solo primera vez)
  * Carga las plantillas por defecto si no hay ninguna guardada
  */
 function initializeTemplates() {
   const savedTemplates = getAllTemplates();
-  const hasDefaultTemplates = Object.keys(DEFAULT_TEMPLATES).every(
-    id => savedTemplates[id]
-  );
+  const isEmpty = Object.keys(savedTemplates).length === 0;
   
-  if (!hasDefaultTemplates) {
-    // Asegurar que las plantillas por defecto existen
-    const updatedTemplates = { ...DEFAULT_TEMPLATES, ...savedTemplates };
-    saveAllTemplates(updatedTemplates);
+  if (isEmpty) {
+    saveAllTemplates({ ...DEFAULT_TEMPLATES });
   }
+}
+
+/**
+ * Restablecer plantillas a valores por defecto
+ */
+function resetToDefaults() {
+  saveAllTemplates({ ...DEFAULT_TEMPLATES });
+  return true;
 }
 
 /**
@@ -606,5 +604,6 @@ export {
   createNewTemplate,
   getTemplatesForMenu,
   getLoadPresetHandler,
-  initializeTemplates
+  initializeTemplates,
+  resetToDefaults
 };
